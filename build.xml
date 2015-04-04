@@ -1,4 +1,6 @@
-<project name="templateProject" xmlns:jacoco="antlib:org.jacoco.ant" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="templateProject"
+         xmlns:jacoco="antlib:org.jacoco.ant"
+         xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="project" value="MISSING_NAME" />
 	<property name="project.deps" value="" />
@@ -39,7 +41,15 @@
 	<property name="reports.console.dir" location="${reports.dir}/console" />
 	<property name="dist.dir" location="${build.dir}/dist" />
 
-	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${tools.lib.dir}/ant-contrib-1.0b3.jar" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml"
+	         classpath="${tools.lib.dir}/ant-contrib-1.0b3.jar" />
+	
+	<taskdef resource="proguard/ant/task.properties"
+	         classpath="${tools.lib.dir}/proguard-5.2.1.jar" />
+	
+	<taskdef name="launch4j"
+	         classname="net.sf.launch4j.ant.Launch4jTask"
+	         classpath="${tools.lib.dir}/launch4j-3.7/launch4j.jar:${tools.lib.dir}/launch4j-3.7/lib/xstream.jar" />
 
 	<var name="project.deps.path.joined" value="" />
 	<for list="${project.deps}" param="d">
@@ -51,7 +61,8 @@
 					<var name="project.deps.path.joined" value="${full}" />
 				</then>
 				<else>
-					<var name="project.deps.path.joined" value="${project.deps.path.joined};${full}" />
+					<var name="project.deps.path.joined"
+					     value="${project.deps.path.joined};${full}" />
 				</else>
 			</if>
 		</sequential>
@@ -70,7 +81,9 @@
 		<path refid="libs.path" />
 	</path>
 
-	<target name="all" depends="init, clean, deps, compile, test, pmd, cpd, findbugs, pack, clean-tmp, tattletale" description="Compile, test and pack">
+	<target name="all"
+	        depends="init, clean, deps, compile, test, pmd, cpd, findbugs, pack, clean-tmp, tattletale"
+	        description="Compile, test and pack">
 	</target>
 
 	<target name="init">
@@ -92,7 +105,11 @@
 		<mkdir dir="${reports.console.dir}" />
 		<record name="${reports.console.dir}/javac.src.out" action="start" />
 
-		<javac destdir="${build.javac.dir}" debug="true" includeantruntime="false" target="${javac.target}" source="${javac.target}">
+		<javac destdir="${build.javac.dir}"
+		       debug="true"
+		       includeantruntime="false"
+		       target="${javac.target}"
+		       source="${javac.target}">
 			<compilerarg value="-Xlint:all" />
 			<src path="${src.dir}" />
 			<classpath refid="compile.path" />
@@ -112,7 +129,11 @@
 		<mkdir dir="${reports.console.dir}" />
 		<record name="${reports.console.dir}/javac.tests.out" action="start" />
 
-		<javac destdir="${build.tests.dir}" debug="true" includeantruntime="false" target="${javac.target}" source="${javac.target}">
+		<javac destdir="${build.tests.dir}"
+		       debug="true"
+		       includeantruntime="false"
+		       target="${javac.target}"
+		       source="${javac.target}">
 			<compilerarg value="-Xlint:all" />
 			<src path="${tests.dir}" />
 			<classpath refid="compile.path" />
@@ -128,14 +149,19 @@
 		</copy>
 	</target>
 
-	<target name="test" depends="check-tests, compile-tests" if="tests.present" description="Run the tests">
+	<target name="test"
+	        depends="check-tests, compile-tests"
+	        if="tests.present"
+	        description="Run the tests">
 		<delete dir="${reports.junit.dir}" quiet="true" />
 		<mkdir dir="${reports.junit.dir}" />
 
 		<delete dir="${reports.coverage.dir}" quiet="true" />
 		<mkdir dir="${reports.coverage.dir}" />
 
-		<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${tools.lib.dir}/jacocoant.jar" />
+		<taskdef uri="antlib:org.jacoco.ant"
+		         resource="org/jacoco/ant/antlib.xml"
+		         classpath="${tools.lib.dir}/jacocoant.jar" />
 
 		<jacoco:coverage destfile="${reports.coverage.dir}/jacoco.exec">
 			<junit fork="yes" forkmode="once">
@@ -227,13 +253,17 @@
 	</target>
 
 	<target name="findbugs" depends="init" description="Run FindBugs on sources">
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${tools.lib.dir}/findbugs/lib/findbugs-ant.jar" />
+		<taskdef name="findbugs"
+		         classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+		         classpath="${tools.lib.dir}/findbugs/lib/findbugs-ant.jar" />
 		<property name="findbugs.home" value="${tools.lib.dir}/findbugs" />
 
 		<delete dir="${reports.findbugs.dir}" quiet="true" />
 		<mkdir dir="${reports.findbugs.dir}" />
 
-		<findbugs home="${findbugs.home}" output="xml:withMessages" outputFile="${reports.findbugs.dir}/findbugs.xml">
+		<findbugs home="${findbugs.home}"
+		          output="xml:withMessages"
+		          outputFile="${reports.findbugs.dir}/findbugs.xml">
 			<sourcePath path="${src.dir}" />
 			<sourcePath path="${tests.dir}" />
 			<class location="${build.javac.dir}" />
@@ -253,7 +283,9 @@
 
 		<delete dir="${reports.tattletale.dir}" quiet="true" />
 
-		<tattletale source="${project.dir}" destination="${reports.tattletale.dir}" excludes="**/maven/**" />
+		<tattletale source="${project.dir}"
+		            destination="${reports.tattletale.dir}"
+		            excludes="**/maven/**" />
 	</target>
 
 	<target name="pack" depends="init" description="Create jar archives">
@@ -269,13 +301,15 @@
 		<if>
 			<istrue value="${tests.present}" />
 			<then>
-				<jar jarfile="${dist.dir}/${project}-${version}-tests.jar" basedir="${build.tests.dir}" />
+				<jar jarfile="${dist.dir}/${project}-${version}-tests.jar"
+				     basedir="${build.tests.dir}" />
 			</then>
 		</if>
 	</target>
 
 	<target name="report" depends="init">
-		<taskdef resource="org/pescuma/buildhealth/ant/antlib.xml" classpath="${tools.lib.dir}/buildhealth-0.3.jar" />
+		<taskdef resource="org/pescuma/buildhealth/ant/antlib.xml"
+		         classpath="${tools.lib.dir}/buildhealth-0.3.jar" />
 
 		<buildhealth home="${reports.dir}/builhealth" report="true" notify="true">
 			<config key="coverage good" value="90" />
@@ -338,10 +372,13 @@
 	<target name="deps" depends="install-ivy" description="Download dependencies needed to build">
 		<property name="ivy.dep.file" value="${lib.dir}/ivy.xml" />
 		<ivy:settings file="${tools.dir}/ivysettings.xml" />
-		<ivy:retrieve sync="true" pattern="${lib.auto.dir}/[conf]/[artifact]-[revision]-[type].[ext]" />
+		<ivy:retrieve sync="true"
+		              pattern="${lib.auto.dir}/[conf]/[artifact]-[revision]-[type].[ext]" />
 	</target>
 
-	<target name="check-deps" depends="install-ivy" description="Check new versions of the dependencies">
+	<target name="check-deps"
+	        depends="install-ivy"
+	        description="Check new versions of the dependencies">
 		<property name="ivy.dep.file" value="${lib.dir}/ivy.xml" />
 		<ivy:settings file="${tools.dir}/ivysettings.xml" />
 		<ivy:checkdepsupdate />
@@ -355,16 +392,25 @@
 		<property name="ivy.dep.file" value="${lib.dir}/ivy.xml" />
 		<ivy:settings file="${tools.dir}/ivysettings.xml" />
 		<ivy:resolve revision="${version}" />
-		<ivy:makepom ivyfile="${ivy.dep.file}" pomfile="${dist.dir}/maven/${project}.pom" conf="default">
-			<mapping conf="default" scope="runtime" />
+		<ivy:makepom ivyfile="${ivy.dep.file}"
+		             pomfile="${dist.dir}/maven/${project}.pom"
+		             conf="runtime">
+			<mapping conf="runtime" scope="runtime" />
 		</ivy:makepom>
 	</target>
 
-	<target name="mvn-publish" depends="install-ivy,mvn-generate-pom" description="Publish to maven repo at bintray">
-		<copy file="${dist.dir}/${project}-${version}.jar" tofile="${dist.dir}/maven/${project}.jar" />
-		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${dist.dir}/maven/${project}-sources.jar" />
+	<target name="mvn-publish"
+	        depends="install-ivy,mvn-generate-pom"
+	        description="Publish to maven repo at bintray">
+		<copy file="${dist.dir}/${project}-${version}.jar"
+		      tofile="${dist.dir}/maven/${project}.jar" />
+		<copy file="${dist.dir}/${project}-${version}-source.jar"
+		      tofile="${dist.dir}/maven/${project}-sources.jar" />
 
-		<ivy:publish resolver="bintray-publish" pubrevision="${version}" overwrite="true" publishivy="false">
+		<ivy:publish resolver="bintray-publish"
+		             pubrevision="${version}"
+		             overwrite="true"
+		             publishivy="false">
 			<artifacts pattern="${dist.dir}/maven/[artifact](-[classifier]).[ext]" />
 		</ivy:publish>
 	</target>
@@ -377,14 +423,18 @@
 
 	<target name="download-ivy">
 		<mkdir dir="${ivy.jar.dir}" />
-		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+		<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+		     dest="${ivy.jar.file}"
+		     usetimestamp="true" />
 	</target>
 
 	<target name="install-ivy" depends="download-ivy">
 		<path id="ivy.lib.path">
 			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
 		</path>
-		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+		<taskdef resource="org/apache/ivy/ant/antlib.xml"
+		         uri="antlib:org.apache.ivy.ant"
+		         classpathref="ivy.lib.path" />
 	</target>
 
 	<!-- Clean -->
