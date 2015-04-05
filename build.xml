@@ -1,6 +1,6 @@
 <project name="java-build-utils" xmlns:jacoco="antlib:org.jacoco.ant" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-	<property name="project" value="MISSING_NAME" />
+	<property name="project" value="${ant.project.name}" />
 	<property name="project.deps" value="" />
 	<property name="version" value="devel" />
 	<property name="ivy.publish.root" value="MISSING_URL" />
@@ -38,6 +38,7 @@
 	<property name="reports.tattletale.dir" location="${reports.dir}/tattletale" />
 	<property name="reports.console.dir" location="${reports.dir}/console" />
 	<property name="dist.dir" location="${build.dir}/dist" />
+	<property name="mvn.dist.dir" location="${build.dir}/maven" />
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${tools.lib.dir}/ant-contrib-1.0b3.jar" />
 
@@ -369,24 +370,33 @@
 	</target>
 
 	<target name="mvn-generate-pom" depends="ivy-install">
-		<delete dir="${dist.dir}/maven" quiet="true" />
-		<mkdir dir="${dist.dir}/maven" />
+		<delete dir="${mvn.dist.dir}/maven" quiet="true" />
+		<mkdir dir="${mvn.dist.dir}/maven" />
 
 		<property name="ivy.pom.version" value="${version}" />
 		<property name="ivy.dep.file" value="${lib.dir}/ivy.xml" />
 		<ivy:settings file="${tools.dir}/ivysettings.xml" />
 		<ivy:resolve revision="${version}" />
-		<ivy:makepom ivyfile="${ivy.dep.file}" pomfile="${dist.dir}/maven/${project}.pom" conf="runtime">
+		<ivy:makepom ivyfile="${ivy.dep.file}" pomfile="${mvn.dist.dir}/${project}.pom" conf="runtime">
 			<mapping conf="runtime" scope="runtime" />
 		</ivy:makepom>
 	</target>
 
 	<target name="mvn-publish" depends="ivy-install,mvn-generate-pom" description="Publish to maven repo at bintray">
-		<copy file="${dist.dir}/${project}-${version}.jar" tofile="${dist.dir}/maven/${project}.jar" />
-		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${dist.dir}/maven/${project}-sources.jar" />
+		<copy file="${dist.dir}/${project}-${version}.jar" tofile="${mvn.dist.dir}/${project}.jar" />
+		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${mvn.dist.dir}/${project}-sources.jar" />
 
 		<ivy:publish resolver="bintray-publish" pubrevision="${version}" overwrite="true" publishivy="false">
-			<artifacts pattern="${dist.dir}/maven/[artifact](-[classifier]).[ext]" />
+			<artifacts pattern="${mvn.dist.dir}/[artifact](-[classifier]).[ext]" />
+		</ivy:publish>
+	</target>
+
+	<target name="ivy-publish-local" depends="ivy-install,mvn-generate-pom" description="Publish to local ivy repo">
+		<copy file="${dist.dir}/${project}-${version}.jar" tofile="${mvn.dist.dir}/${project}.jar" />
+		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${mvn.dist.dir}/${project}-sources.jar" />
+
+		<ivy:publish resolver="local" pubrevision="${version}" overwrite="true">
+			<artifacts pattern="${mvn.dist.dir}/[artifact](-[classifier]).[ext]" />
 		</ivy:publish>
 	</target>
 
