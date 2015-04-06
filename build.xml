@@ -72,7 +72,7 @@
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar" />
 			<exclude name="**/*-source.jar" />
-			<exclude name="auto/runtime/**/*" />
+			<exclude name="auto/default/**/*" />
 		</fileset>
 	</path>
 	<path id="compile.path">
@@ -249,10 +249,10 @@
 	</target>
 
 	<target name="findbugs" depends="init" description="Run FindBugs on sources">
+		<property name="findbugs.home" value="${tools.lib.dir}/findbugs-3.0.1" />
 		<taskdef name="findbugs"
 		         classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
-		         classpath="${tools.lib.dir}/findbugs/lib/findbugs-ant.jar" />
-		<property name="findbugs.home" value="${tools.lib.dir}/findbugs" />
+		         classpath="${findbugs.home}/lib/findbugs-ant.jar" />
 
 		<delete dir="${reports.findbugs.dir}" quiet="true" />
 		<mkdir dir="${reports.findbugs.dir}" />
@@ -377,25 +377,25 @@
 		<property name="ivy.dep.file" value="${lib.dir}/ivy.xml" />
 		<ivy:settings file="${tools.dir}/ivysettings.xml" />
 		<ivy:resolve revision="${version}" />
-		<ivy:makepom ivyfile="${ivy.dep.file}" pomfile="${mvn.dist.dir}/${project}.pom" conf="runtime">
-			<mapping conf="runtime" scope="runtime" />
+		<ivy:makepom ivyfile="${ivy.dep.file}" pomfile="${mvn.dist.dir}/${project}.pom" conf="default">
+			<mapping conf="default" scope="runtime" />
 		</ivy:makepom>
 	</target>
 
 	<target name="mvn-publish" depends="ivy-install,mvn-generate-pom" description="Publish to maven repo at bintray">
 		<copy file="${dist.dir}/${project}-${version}.jar" tofile="${mvn.dist.dir}/${project}.jar" />
-		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${mvn.dist.dir}/${project}-sources.jar" />
+		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${mvn.dist.dir}/${project}-source.jar" />
 
-		<ivy:publish resolver="bintray-publish" pubrevision="${version}" overwrite="true" publishivy="false">
+		<ivy:publish resolver="bintray-publish" revision="${version}" overwrite="true" publishivy="false">
 			<artifacts pattern="${mvn.dist.dir}/[artifact](-[classifier]).[ext]" />
 		</ivy:publish>
 	</target>
 
 	<target name="ivy-publish-local" depends="ivy-install,mvn-generate-pom" description="Publish to local ivy repo">
 		<copy file="${dist.dir}/${project}-${version}.jar" tofile="${mvn.dist.dir}/${project}.jar" />
-		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${mvn.dist.dir}/${project}-sources.jar" />
+		<copy file="${dist.dir}/${project}-${version}-source.jar" tofile="${mvn.dist.dir}/${project}-source.jar" />
 
-		<ivy:publish resolver="local" pubrevision="${version}" overwrite="true">
+		<ivy:publish resolver="local" revision="${version}" overwrite="true" forcedeliver="true" publishivy="true">
 			<artifacts pattern="${mvn.dist.dir}/[artifact](-[classifier]).[ext]" />
 		</ivy:publish>
 	</target>
