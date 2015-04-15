@@ -288,12 +288,26 @@
 			<fileset dir="${src.dir}">
 				<exclude name="**/*.java" />
 			</fileset>
+			<manifest>
+				<attribute name="Specification-Version" value="${version}" />
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
-		<jar jarfile="${dist.dir}/${project}-${version}-source.jar" basedir="${src.dir}" />
+		<jar jarfile="${dist.dir}/${project}-${version}-source.jar" basedir="${src.dir}">
+			<manifest>
+				<attribute name="Specification-Version" value="${version}" />
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
+		</jar>
 		<if>
 			<istrue value="${tests.present}" />
 			<then>
-				<jar jarfile="${dist.dir}/${project}-${version}-tests.jar" basedir="${build.tests.dir}" />
+				<jar jarfile="${dist.dir}/${project}-${version}-tests.jar" basedir="${build.tests.dir}">
+					<manifest>
+						<attribute name="Specification-Version" value="${version}" />
+						<attribute name="Implementation-Version" value="${version}" />
+					</manifest>
+				</jar>
 			</then>
 		</if>
 	</target>
